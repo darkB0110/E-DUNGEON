@@ -219,7 +219,7 @@ export const backend = {
 
   transactions: {
     process: async (fanId: string, performerId: string, amount: number, type: string = 'GENERIC'): Promise<{ success: boolean; updatedUser: User | null }> => {
-        // AUTOMATED 70/30 SPLIT LOGIC
+        // AUTOMATED REVENUE SPLIT LOGIC
         const db = getDB();
         const user = db.users.find(u => u.id === fanId);
         const performer = db.performers.find(p => p.id === performerId);
@@ -232,8 +232,21 @@ export const backend = {
             user.tokens -= amount;
 
             // 2. Calculate Split
-            const modelShare = Math.ceil(amount * 0.70); // 70% to Model
-            const platformShare = amount - modelShare;   // 30% to Platform
+            // Default: 70% Model / 30% Platform (Subs, Small Tips, Room Minutes)
+            let modelSharePercent = 0.70;
+
+            // Revised Rule: 
+            // - Tips > 500 Tokens: 65% Model / 35% Platform
+            // - Purchases (Merch, Content, Posts): 65% Model / 35% Platform
+            const isHighValueTip = type === 'TIP' && amount > 500;
+            const isPurchase = ['MERCH_BUY', 'CONTENT_UNLOCK', 'POST_UNLOCK'].includes(type);
+
+            if (isHighValueTip || isPurchase) {
+                modelSharePercent = 0.65;
+            }
+
+            const modelShare = Math.ceil(amount * modelSharePercent);
+            const platformShare = amount - modelShare;   
 
             // 3. Credit Model
             if (performer) {
@@ -498,13 +511,9 @@ export const backend = {
     },
 
     unlock: async (userId: string, messageId: string, cost: number) => {
-        // Use transaction logic for message unlock too
         const db = getDB();
         const msg = db.messages.find(m => m.id === messageId);
-        const performerId = msg ? msg.senderId : 'unknown'; // Simplified
-        
-        // We'll call process logic manually or refactor this. 
-        // For simplicity, reusing manual logic here but ideally should use transactions.process
+        const performerId = msg ? msg.senderId : 'unknown';
         
         const user = db.users.find(u => u.id === userId);
         const performer = db.performers.find(p => p.id === performerId);
@@ -512,8 +521,9 @@ export const backend = {
         if (user && user.tokens >= cost) {
             user.tokens -= cost;
             
-            // 70/30 Split
-            const modelShare = Math.ceil(cost * 0.70);
+            // Apply 65/35 split for message unlocks (purchases)
+            const modelSharePercent = 0.65;
+            const modelShare = Math.ceil(cost * modelSharePercent);
             const platformShare = cost - modelShare;
             
             if (performer) performer.earnings += modelShare;

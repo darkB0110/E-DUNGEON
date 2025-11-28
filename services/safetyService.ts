@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 // Simulate a connection to a Computer Vision / Safety API
@@ -52,11 +51,8 @@ export const safetyService = {
 
   // Analyze text/metadata using Gemini (Real AI call if key exists)
   analyzeMetadata: async (description: string): Promise<boolean> => {
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) return true;
-
       try {
-        const client = new GoogleGenAI({ apiKey });
+        const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const response = await client.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: `Analyze this content description for intent to distribute deepfakes or non-consensual AI content. 

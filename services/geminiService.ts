@@ -1,15 +1,10 @@
-
-
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 let aiClient: GoogleGenAI | null = null;
 
 const getAiClient = () => {
   if (!aiClient) {
-    const apiKey = process.env.API_KEY;
-    if (apiKey) {
-      aiClient = new GoogleGenAI({ apiKey });
-    }
+    aiClient = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
   return aiClient;
 };
