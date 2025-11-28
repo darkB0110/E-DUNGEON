@@ -1,0 +1,8 @@
+{
+  "name": "E-DUNGEON",
+  "description": "A premium, dark-themed immersive streaming platform offering exclusive interactive experiences with AI-powered performers.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

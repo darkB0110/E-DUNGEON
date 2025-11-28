@@ -1,0 +1,22 @@
+
+{
+  "name": "THE DUNGEON",
+  "short_name": "DUNGEON",
+  "description": "Premium immersive streaming platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0505",
+  "theme_color": "#0a0505",
+  "icons": [
+    {
+      "src": "https://picsum.photos/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
